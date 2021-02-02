@@ -1,6 +1,11 @@
 import axios from "axios";
 import notify from "./Notify";
-import store from "../stores/rootStore";
+// import store from "../stores/rootStore";
+import Cookies from "js-cookie"
+import jwt from "jwt-decode";
+import ActionUtility from "./ActionUtility";
+import AuthsAction from "../stores/auths/AuthsAction";
+
 
 let httpUtility = axios.create({
     baseURL: process.env.REACT_APP_SERVER,
@@ -21,19 +26,41 @@ httpUtility.interceptors.response.use(function (response) {
     console.log(error);
 
     if (error.response.status === 422) {
-        const { error: { errors }} = error.response.data;
-        notify(errors[Object.keys(errors)[0]], 'error');
+        const { message } = error.response.data;
+        notify(message, 'error');
     }
 
     if (error.response.status === 401) {
-        const { error: { message } } = error.response.data;
+        const { message } = error.response.data;
+
+        const token = Cookies.get("token")
+
+        if(token){
+
+            const decode = jwt(token)
+            const now = new Date()
+            const expires = new Date(decode.exp * 1000)
+
+            if(now.getTime() >= expires.getTime()){
+                Cookies.remove("token")
+                notify("session is expired.", 'warn');
+                return async (dispatch) => {
+                    await dispatch(ActionUtility.createAction(AuthsAction.LOGOUT));
+                    return window.location.href = '/session-expired';
+                }
+
+            }
+        } else {
+            notify("session is expired.", 'warn');
+            return async (dispatch) => {
+                await dispatch(ActionUtility.createAction(AuthsAction.LOGOUT));
+                return window.location.href = '/session-expired';
+            }
+
+        }
+
         notify(message, 'error');
 
-        const isLoggedIn = store.getState().auths.isLoggedIn;
-
-        if (isLoggedIn) {
-            return window.location.href = '/login';
-        }
     }
 
     // alert(message);

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Container } from "react-bootstrap";
-import Bar from "../components/Bar";
+import Header from "../components/Header";
+
 function MainLayout(props) {
     return (
         <Container>
-            <Bar/>
+            <Header/>
             {props.children}
         </Container>
     )

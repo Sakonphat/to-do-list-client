@@ -77,8 +77,11 @@ function Register(props) {
         Object.values(values).forEach((value, index) => {
             let key = keys[index];
             errorsTemp[key] = checkCase(key, value);
+            if(errorsTemp[key]){
+                isValid = false;
+            }
             setErrors(errorsTemp);
-            isValid = false;
+
         });
         return isValid;
     };
@@ -88,12 +91,13 @@ function Register(props) {
 
         if(validateForm()){
             let data = { ...values }
-            console.log(data);
+            // console.log(data);
             const response = await dispatch(AuthsAction.register(data));
-            console.log(response);
-            notify(response.data.message, 'success');
-            props.history.push('/login')
-
+            // console.log(response);
+            if(response.status === 200){
+                notify(response.data.message, 'success');
+                props.history.push('/login')
+            }
         }
         else{
             console.error('Invalid Form');
@@ -154,7 +158,7 @@ function Register(props) {
                     </Form.Group>
                 </div>
                 <div className="d-flex justify-content-center mt-2">
-                    <Button type="submit"  >Submit</Button>
+                    <Button type="submit"  >Register</Button>
                 </div>
             </Form>
         </>

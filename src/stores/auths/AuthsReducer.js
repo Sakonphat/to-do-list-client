@@ -1,24 +1,23 @@
-import AuthsAction from "./AuthsAction";
 
 const initialState = {
     user: null,
     isLoggedIn: null
 };
 
-const registerActions = {AuthsAction};
 
 export default function AuthsReducer(state = initialState, action) {
     switch (action.type) {
-        case registerActions.REGISTER :
+        case "AuthsAction.REGISTER" :
             return {
                 ...state
             };
-        case registerActions.LOGIN :
+        case "AuthsAction.LOGIN" :
             return {
                 ...state,
-                user: action.payload.user
+                user: action.payload.user,
+                isLoggedIn: action.payload.isLoggedIn,
             };
-        case registerActions.LOGOUT :
+        case "AuthsAction.LOGOUT" :
             return {
                 ...state,
                 user: null,

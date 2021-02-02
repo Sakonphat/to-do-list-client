@@ -1,5 +1,7 @@
 import ActionUtility from "../../utils/ActionUtility";
 import AuthsEffect from "./AuthsEffect";
+import jwt from "jwt-decode";
+import Cookies from "js-cookie"
 
 class AuthsAction {
     static REGISTER = "AuthsAction.REGISTER";
@@ -23,8 +25,22 @@ class AuthsAction {
             const response = await AuthsEffect.login(data);
 
             if (response.data.success) {
+
+                const { token } = response.data.data
+                const decode = jwt(token)
+
+                console.log(decode)
+                const expires = new Date(decode.exp * 1000)
+
+                Cookies.set("token", token, { expires:  expires })
+
+                const user = {
+                    uuid : decode.uuid,
+                    username : decode.username
+                }
+                console.log(user)
                 const payload = {
-                    user: response.data.data.user,
+                    user: user,
                     isLoggedIn: response.data.success
                 };
 

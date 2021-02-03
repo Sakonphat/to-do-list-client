@@ -15,8 +15,6 @@ export default class AuthsEffect {
 
         let token = Cookies.get("token")
 
-        console.log(token)
-
         HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
 
         return await HttpUtility.post('/api/v1/logout');

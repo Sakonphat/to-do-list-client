@@ -1,11 +1,11 @@
 import axios from "axios";
 import notify from "./Notify";
-// import store from "../stores/rootStore";
 import Cookies from "js-cookie"
 import jwt from "jwt-decode";
+import ModalAction from "../stores/global/modal/ModalAction";
+import store from "../stores/rootStore";
 import ActionUtility from "./ActionUtility";
-import AuthsAction from "../stores/auths/AuthsAction";
-
+import AuthsAction from "../stores/auths/AuthsAction"
 
 let httpUtility = axios.create({
     baseURL: process.env.REACT_APP_SERVER,
@@ -27,11 +27,11 @@ httpUtility.interceptors.response.use(function (response) {
 
     if (error.response.status === 422) {
         const { message } = error.response.data;
-        notify(message, 'error');
+        console.log(message)
+        notify(message[Object.keys(message)[0]], 'error');
     }
 
     if (error.response.status === 401) {
-        const { message } = error.response.data;
 
         const token = Cookies.get("token")
 
@@ -43,30 +43,26 @@ httpUtility.interceptors.response.use(function (response) {
 
             if(now.getTime() >= expires.getTime()){
                 Cookies.remove("token")
-                notify("session is expired.", 'warn');
-                return async (dispatch) => {
-                    await dispatch(ActionUtility.createAction(AuthsAction.LOGOUT));
-                    return window.location.href = '/session-expired';
-                }
-
+                // notify("session is expired.", 'warn');
+                store.dispatch(ActionUtility.createAction(AuthsAction.LOGOUT, null))
+                store.dispatch(ModalAction.setModal(
+                    "Session is expired","Please, Login again."
+                ))
             }
         } else {
-            notify("session is expired.", 'warn');
-            return async (dispatch) => {
-                await dispatch(ActionUtility.createAction(AuthsAction.LOGOUT));
-                return window.location.href = '/session-expired';
-            }
-
+            // notify("session is expired.", 'warn');
+            store.dispatch(ActionUtility.createAction(AuthsAction.LOGOUT, null))
+            store.dispatch(ModalAction.setModal(
+                "Session is expired","Please, Login again."
+            ))
         }
-
-        notify(message, 'error');
 
     }
 
     // alert(message);
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    return error;
+    return error.response;
 });
 
 export default httpUtility;

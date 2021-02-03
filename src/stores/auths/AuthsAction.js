@@ -29,16 +29,16 @@ class AuthsAction {
                 const { token } = response.data.data
                 const decode = jwt(token)
 
-                console.log(decode)
+                // console.log(decode)
                 const expires = new Date(decode.exp * 1000)
 
                 Cookies.set("token", token, { expires:  expires })
-
+                console.log(token)
                 const user = {
                     uuid : decode.uuid,
                     username : decode.username
                 }
-                console.log(user)
+                // console.log(user)
                 const payload = {
                     user: user,
                     isLoggedIn: response.data.success
@@ -54,7 +54,6 @@ class AuthsAction {
     static logout() {
         return async (dispatch) => {
             const response = await AuthsEffect.logout();
-
             dispatch(ActionUtility.createAction(AuthsAction.LOGOUT));
 
             return response

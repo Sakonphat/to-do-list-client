@@ -12,14 +12,12 @@ import {
     useDispatch,
     useSelector
 } from "react-redux";
-// import { useHistory } from 'react-router-dom';
 import AuthsAction from "../stores/auths/AuthsAction";
 import notify from "../utils/Notify";
 import Cookies from "js-cookie"
 
 function Header() {
 
-    // const history = useHistory();
     const dispatch = useDispatch();
     const { isLoggedIn, user } = useSelector(state => state.auths);
 
@@ -28,7 +26,6 @@ function Header() {
         if(response.status === 200){
             Cookies.remove("token")
             notify(response.data.message, 'success');
-            // history.push('/')
         }
     }
 

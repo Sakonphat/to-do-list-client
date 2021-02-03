@@ -4,7 +4,7 @@ import AuthsAction from "../stores/auths/AuthsAction";
 import notify from "../utils/Notify";
 import {useDispatch} from "react-redux";
 
-function Login(props) {
+function Login() {
 
     const initialValues = {
         username: '',
@@ -86,7 +86,7 @@ function Login(props) {
             // console.log(response);
             if(response.status === 200){
                 notify(response.data.message, 'success');
-                props.history.push('/')
+                // props.history.push('/')
             }
         }
         else{

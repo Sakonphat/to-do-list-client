@@ -11,9 +11,9 @@ export default class TasksEffect{
         return await HttpUtility.post('/api/v1/tasks');
     }
 
-    static async createTask() {
+    static async createTask(data) {
         let token = Cookies.get("token")
         HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
-        return await HttpUtility.post('/api/v1/task');
+        return await HttpUtility.post('/api/v1/task', data);
     }
 }

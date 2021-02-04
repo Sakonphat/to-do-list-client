@@ -29,6 +29,10 @@ function Header() {
         }
     }
 
+    const marginLeft = {
+        marginLeft:"auto"
+    }
+
     return (
         <Row>
             <Navbar collapseOnSelect expand="lg" variant="dark" bg="dark">
@@ -37,7 +41,7 @@ function Header() {
                 </Navbar.Brand>
                 {
                     !isLoggedIn ?
-                        <>
+                        <div style={marginLeft}>
                             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                             <Navbar.Collapse id="responsive-navbar-nav">
                                 <Nav className="ml-auto">
@@ -45,11 +49,11 @@ function Header() {
                                     <Nav.Link href="/register">Register</Nav.Link>
                                 </Nav>
                             </Navbar.Collapse>
-                        </> : null
+                        </div> : null
                 }
                 {
                     isLoggedIn ?
-                        <div className="ml-auto">
+                        <div style={marginLeft}>
                             <NavDropdown title={user.username} id="nav-dropdown" >
                                 <NavDropdown.Item
                                     eventKey="4.1"

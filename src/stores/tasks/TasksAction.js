@@ -24,10 +24,10 @@ class TasksAction {
         }
     }
 
-    static createTask(){
+    static createTask(data){
         return async (dispatch) => {
 
-            const response  = await TasksEffect.createTask()
+            const response  = await TasksEffect.createTask(data)
 
             dispatch(ActionUtility.createAction(TasksAction.CREATE_TASK, response))
 

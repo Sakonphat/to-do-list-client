@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Col,
     Row,
@@ -11,11 +11,12 @@ import {
 } from "react-redux";
 import Skeleton from "react-loading-skeleton";
 import TasksAction from "../stores/tasks/TasksAction";
-import notify from "../utils/Notify";
+import CreateTaskModal from "./Modals/CreateTaskModal";
 
 function TaskBoard() {
 
     const dispatch = useDispatch();
+    const [openCreateTaskModal, setOpenCreateTaskModal] = useState(false);
 
     useEffect( () => {
 
@@ -50,7 +51,7 @@ function TaskBoard() {
         for (let i = 0; i < 3; i++) {
             items.push(
                 <div key={"task_skeleton"+i} className="d-flex justify-content-center mb-4">
-                    <Skeleton height={100} width={800} />
+                    <Skeleton height={100} width={1020} />
                 </div>
             )
         }
@@ -58,18 +59,17 @@ function TaskBoard() {
         return items
     }
 
-    const handleCreateTask = async (event) => {
-        event.preventDefault()
-        const response = await dispatch(TasksAction.createTask())
 
-        if(response.status === 200){
-            notify(response.data.message, 'success');
-        }
-    }
 
     const renderCreateTaskBtn = () => {
         return (
-            <Button onClick={handleCreateTask}>
+            <Button onClick={
+                event => {
+                    event.preventDefault()
+
+                    setOpenCreateTaskModal(true)
+                }
+            }>
                 Create Task
             </Button>
         );
@@ -82,15 +82,14 @@ function TaskBoard() {
             items.push(
                 <Row key={"div_task_"+index}>
                     <Col>
-                        <Card style={cardPosition}>
+                        <Card className="my-auto mx-5">
                             <Card.Body>
-                                <div className="d-flex justify-content-center">
+                                <div className="my-auto mx-5">
                                     <Card.Title>{item.title}</Card.Title>
                                 </div>
-                                <div className="d-flex justify-content-center">
+                                <div className="my-auto mx-5">
                                     <Card.Text>{item.description}</Card.Text>
                                 </div>
-
                             </Card.Body>
                         </Card>
                     </Col>
@@ -160,6 +159,14 @@ function TaskBoard() {
             <div className="mt-4">
                 { loading ? renderTaskSkeleton() : renderBody() }
             </div>
+            <CreateTaskModal
+                show={openCreateTaskModal}
+                onHide={
+                    () => {
+                        setOpenCreateTaskModal(false)
+                    }
+                }
+            />
         </>
     );
 }

@@ -33,7 +33,7 @@ class AuthsAction {
                 const expires = new Date(decode.exp * 1000)
 
                 Cookies.set("token", token, { expires:  expires })
-                console.log(token)
+                // console.log(token)
                 const user = {
                     uuid : decode.uuid,
                     username : decode.username

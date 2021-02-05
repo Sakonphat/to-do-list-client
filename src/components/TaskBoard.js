@@ -12,15 +12,48 @@ import {
 import Skeleton from "react-loading-skeleton";
 import TasksAction from "../stores/tasks/TasksAction";
 import CreateTaskModal from "./Modals/CreateTaskModal";
+import TaskDetailModal from "./Modals/TaskDetailModal";
+import EditTaskModal from "./Modals/EditTaskModal";
+import {
+    FaTrashAlt,
+    FaEdit,
+    FaUndoAlt,
+    FaCheckCircle
+}
+from "react-icons/fa";
+import LoadingAction from "../stores/global/loading/LoadingAction";
+
 
 function TaskBoard() {
 
+    const cardPosition = {
+        margin: "auto 8rem"
+    }
+
+    const completedBorder = {
+        borderBottomColor:"#28a745"
+    }
+
+    const unCompletedBorder = {
+        borderBottomColor:"#ffc107"
+    }
+
     const dispatch = useDispatch();
     const [openCreateTaskModal, setOpenCreateTaskModal] = useState(false);
+    const [taskModal, setTaskModal] = useState({
+        isOpenDetail : false,
+        isOpenEdit : false,
+        uuid : "",
+        created_at : "",
+        title : "",
+        description : "",
+        is_completed : false
+    });
 
     useEffect( () => {
 
         async function fetchData() {
+            await dispatch(LoadingAction.unsetLoading())
             await dispatch(TasksAction.getAllTask())
         }
 
@@ -30,13 +63,9 @@ function TaskBoard() {
 
     const { tasks, loading } = useSelector(state => state.tasks);
 
-    const cardPosition = {
-        margin: "auto 8rem"
-    }
-
     const renderTaskSkeleton = () => {
 
-        console.log("mocking")
+        // console.log("mocking")
 
         let items = [];
 
@@ -75,6 +104,25 @@ function TaskBoard() {
         );
     }
 
+    const handleSetTaskModal = (item, type = "detail") => {
+
+        let tempDetail = { ...taskModal }
+
+        if(type === "detail"){
+            tempDetail.isOpenDetail = true
+        }
+        else if(type === "edit"){
+            tempDetail.isOpenEdit = true
+        }
+
+        tempDetail.uuid = item.uuid
+        tempDetail.created_at = item.created_at
+        tempDetail.title = item.title
+        tempDetail.description = item.description
+        tempDetail.is_completed = item.is_completed
+        setTaskModal(tempDetail)
+    }
+
     const getTasks = () => {
         let items = []
 
@@ -82,13 +130,78 @@ function TaskBoard() {
             items.push(
                 <Row key={"div_task_"+index}>
                     <Col>
-                        <Card className="my-auto mx-5">
-                            <Card.Body>
-                                <div className="my-auto mx-5">
-                                    <Card.Title>{item.title}</Card.Title>
-                                </div>
-                                <div className="my-auto mx-5">
-                                    <Card.Text>{item.description}</Card.Text>
+                        <Card className="task my-auto mx-5 mb-4"
+                              style={ item.is_completed ? completedBorder : unCompletedBorder }
+                        >
+                            <Card.Body className="d-flex">
+                                <Card.Title className="flex-grow-1 align-items-center my-2 mx-2">
+                                    <span className="task-detail"
+                                    onClick={
+                                        () => {
+                                            handleSetTaskModal(item)
+                                        }
+                                    }>
+                                        {
+                                            item.title.charAt(0).toUpperCase() +
+                                            (
+                                                item.title.length > 50 ?
+                                                    (item.title.slice(1, 50) + " ...") :
+                                                    item.title.slice(1)
+                                            )
+                                        }
+                                    </span>
+                                </Card.Title>
+                                <div className="d-flex justify-content-end align-items-center">
+                                    <ul className="my-2" style={{listStyleType: "none"}}>
+                                        <li className="icon">
+                                            <a href="/#"
+                                               onClick={
+                                                   event => {
+                                                       event.preventDefault()
+                                                       handleSetTaskModal(item, "edit")
+                                                   }
+                                               }
+                                            >
+                                                <FaEdit style={{color:"#17a2b8"}}/>
+                                            </a>
+                                        </li>
+                                        <li className="icon">
+                                            <a href="/#"
+                                               onClick={
+                                                   event => {
+                                                       event.preventDefault()
+
+                                                   }
+                                               }
+                                            >
+                                                <FaCheckCircle style={{color:"#28a745"}}/>
+                                            </a>
+                                        </li>
+                                        <li className="icon">
+                                            <a href="/#"
+                                               onClick={
+                                                   event => {
+                                                       event.preventDefault()
+
+                                                   }
+                                               }
+                                            >
+                                                <FaUndoAlt style={{color:"#ffc107"}}/>
+                                            </a>
+                                        </li>
+                                        <li className="icon-right">
+                                            <a href="/#"
+                                               onClick={
+                                                   event => {
+                                                       event.preventDefault()
+
+                                                   }
+                                               }
+                                            >
+                                                <FaTrashAlt style={{color:"#dc3545"}}/>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -103,7 +216,7 @@ function TaskBoard() {
 
     const renderBody = () => {
 
-        console.log("real")
+        // console.log("real")
 
         let items = [];
 
@@ -164,6 +277,29 @@ function TaskBoard() {
                 onHide={
                     () => {
                         setOpenCreateTaskModal(false)
+                    }
+                }
+            />
+            <TaskDetailModal
+                show={taskModal.isOpenDetail}
+                task={taskModal}
+                onHide={
+                    () => {
+                        let tempDetail = { ...taskModal }
+                        tempDetail.isOpenDetail = false
+                        setTaskModal(tempDetail)
+                    }
+                }
+            />
+            <EditTaskModal
+                show={taskModal.isOpenEdit}
+                task={taskModal}
+                err={{title:'',description:''}}
+                onHide={
+                    () => {
+                        let tempDetail = { ...taskModal }
+                        tempDetail.isOpenEdit = false
+                        setTaskModal(tempDetail)
                     }
                 }
             />

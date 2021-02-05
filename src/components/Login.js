@@ -133,7 +133,7 @@ function Login() {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </div>
-                <div className="d-flex justify-content-center mt-2">
+                <div className="d-flex justify-content-center mt-4">
                     <Button type="submit"  >Login</Button>
                 </div>
             </Form>

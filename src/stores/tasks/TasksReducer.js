@@ -15,6 +15,10 @@ export default function TasksReducer(state = initialState, action){
             return {
                 ...state
             };
+        case "TasksAction.EDIT_TASK" :
+            return {
+                ...state
+            };
         case "TasksAction.SET_LOADING" :
             return {
                 ...state,

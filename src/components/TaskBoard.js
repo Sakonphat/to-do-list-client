@@ -18,10 +18,13 @@ import {
     FaTrashAlt,
     FaEdit,
     FaUndoAlt,
-    FaCheckCircle
+    FaCheckCircle,
+    FaEye
 }
 from "react-icons/fa";
 import LoadingAction from "../stores/global/loading/LoadingAction";
+import Swal from "sweetalert2";
+import notify from "../utils/Notify";
 
 
 function TaskBoard() {
@@ -123,6 +126,74 @@ function TaskBoard() {
         setTaskModal(tempDetail)
     }
 
+    const handleDeleteTask = async (item) => {
+
+        const html = `
+            <div class="d-flex flex-column justify-content-center">
+                <span>You want to delete your task</span> 
+                <span class="mt-2 mb-4">" ${item.title} " </span>           
+            </div>
+        `
+
+        await Swal.fire({
+            icon: 'question',
+            title: 'Are you sure ?',
+            html: html,
+            confirmButtonText: `Confirm`,
+            showCancelButton: true,
+        }).then( async (result) => {
+            if(result.isConfirmed){
+                await dispatch(LoadingAction.setLoading())
+                let response = await dispatch(TasksAction.deleteTask(item.uuid))
+                if(response.data.success){
+                    notify(response.data.message, 'success');
+                    return window.location.href = '/';
+                }
+            }
+            else{
+                console.log("Cancel")
+            }
+        })
+    }
+
+    const handleSetStatusTask = async (item) => {
+
+        const html = `
+            <div class="d-flex flex-column justify-content-center">
+                <span>You want to set your task</span> 
+                <span class="mt-2">" ${item.title} " </span>     
+                <span class="mt-2 mb-4"> ${item.is_completed ? "to undo task" : "to complete task"} </span>       
+            </div>
+        `
+
+        await Swal.fire({
+            icon: 'question',
+            title: 'Are you sure ?',
+            html: html,
+            confirmButtonText: `Confirm`,
+            showCancelButton: true,
+        }).then( async (result) => {
+            if(result.isConfirmed){
+                await dispatch(LoadingAction.setLoading())
+                let response = ''
+                if(item.is_completed){
+                    response = await dispatch(TasksAction.undoTask(item.uuid))
+                }
+                else if(!item.is_completed){
+                    response = await dispatch(TasksAction.completeTask(item.uuid))
+                }
+
+                if(response.data.success){
+                    notify(response.data.message, 'success');
+                    return window.location.href = '/';
+                }
+            }
+            else{
+                console.log("Cancel")
+            }
+        })
+    }
+
     const getTasks = () => {
         let items = []
 
@@ -135,12 +206,7 @@ function TaskBoard() {
                         >
                             <Card.Body className="d-flex">
                                 <Card.Title className="flex-grow-1 align-items-center my-2 mx-2">
-                                    <span className="task-detail"
-                                    onClick={
-                                        () => {
-                                            handleSetTaskModal(item)
-                                        }
-                                    }>
+                                    <span>
                                         {
                                             item.title.charAt(0).toUpperCase() +
                                             (
@@ -155,6 +221,24 @@ function TaskBoard() {
                                     <ul className="my-2" style={{listStyleType: "none"}}>
                                         <li className="icon">
                                             <a href="/#"
+                                               data-toggle="tooltip"
+                                               data-placement="top"
+                                               title="detail"
+                                               onClick={
+                                                   event => {
+                                                       event.preventDefault()
+                                                       handleSetTaskModal(item)
+                                                   }
+                                               }
+                                            >
+                                                <FaEye style={{color:"#17a2b8"}}/>
+                                            </a>
+                                        </li>
+                                        <li className="icon">
+                                            <a href="/#"
+                                               data-toggle="tooltip"
+                                               data-placement="top"
+                                               title="edit"
                                                onClick={
                                                    event => {
                                                        event.preventDefault()
@@ -162,39 +246,38 @@ function TaskBoard() {
                                                    }
                                                }
                                             >
-                                                <FaEdit style={{color:"#17a2b8"}}/>
+                                                <FaEdit style={{color:"#FF8C00"}}/>
                                             </a>
                                         </li>
                                         <li className="icon">
                                             <a href="/#"
+                                               data-toggle="tooltip"
+                                               data-placement="top"
+                                               title={item.is_completed ? "undo task" : "complete task"}
                                                onClick={
-                                                   event => {
+                                                   async event => {
                                                        event.preventDefault()
-
+                                                       await handleSetStatusTask(item)
                                                    }
                                                }
                                             >
-                                                <FaCheckCircle style={{color:"#28a745"}}/>
-                                            </a>
-                                        </li>
-                                        <li className="icon">
-                                            <a href="/#"
-                                               onClick={
-                                                   event => {
-                                                       event.preventDefault()
+                                                {
+                                                    item.is_completed ?
+                                                        <FaUndoAlt style={{color:"#ffc107"}}/> :
+                                                        <FaCheckCircle style={{color:"#28a745"}}/>
 
-                                                   }
-                                               }
-                                            >
-                                                <FaUndoAlt style={{color:"#ffc107"}}/>
+                                                }
                                             </a>
                                         </li>
                                         <li className="icon-right">
                                             <a href="/#"
+                                               data-toggle="tooltip"
+                                               data-placement="top"
+                                               title="delete"
                                                onClick={
-                                                   event => {
+                                                   async event => {
                                                        event.preventDefault()
-
+                                                       await handleDeleteTask(item)
                                                    }
                                                }
                                             >
@@ -214,6 +297,31 @@ function TaskBoard() {
         return items
     }
 
+    const handleDeleteAllTask = async (event) => {
+        event.preventDefault()
+
+        await Swal.fire({
+            icon: 'question',
+            title: 'Are you sure ?',
+            html: 'You want to delete all your task',
+            confirmButtonText: `Confirm`,
+            showCancelButton: true,
+        }).then( async (result) => {
+            if(result.isConfirmed){
+                await dispatch(LoadingAction.setLoading())
+                let response = await dispatch(TasksAction.deleteAllTask())
+
+                if(response.data.success){
+                    notify(response.data.message, 'success');
+                    return window.location.href = '/';
+                }
+            }
+            else{
+                console.log("Cancel")
+            }
+        })
+    }
+
     const renderBody = () => {
 
         // console.log("real")
@@ -225,8 +333,16 @@ function TaskBoard() {
                 <div key="real_tasks">
                     <Row>
                         <Col>
-                            <div className="d-flex justify-content-center mb-4">
-                                {renderCreateTaskBtn()}
+                            <div className="d-flex justify-content-end mb-4 mx-5">
+                                <div className="">
+                                    {renderCreateTaskBtn()}
+                                </div>
+                                <div className="ml-4">
+                                    <Button variant="danger"
+                                    onClick={handleDeleteAllTask}>
+                                        Delete All Task
+                                    </Button>
+                                </div>
                             </div>
                         </Col>
                     </Row>

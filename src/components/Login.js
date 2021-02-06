@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
 import AuthsAction from "../stores/auths/AuthsAction";
 import notify from "../utils/Notify";
 import {useDispatch} from "react-redux";
+import LoadingAction from "../stores/global/loading/LoadingAction";
 
 function Login() {
 
@@ -14,6 +15,10 @@ function Login() {
     const dispatch = useDispatch();
     const [values, setValues] = useState(initialValues);
     const [errors, setErrors] = useState(initialValues);
+
+    useEffect( () => {
+        dispatch(LoadingAction.unsetLoading())
+    }, [dispatch])
 
     const validateUsername = (value) => {
         let error = '';
@@ -84,7 +89,7 @@ function Login() {
             // console.log(data);
             const response = await dispatch(AuthsAction.login(data));
             // console.log(response);
-            if(response.status === 200){
+            if(response.data.success){
                 notify(response.data.message, 'success');
                 // props.history.push('/')
             }
@@ -103,38 +108,40 @@ function Login() {
                 </Col>
             </Row>
             <Form noValidate onSubmit={handleSubmit}>
-                <div className="d-flex justify-content-center mt-2">
-                    <Form.Group as={Col} md={5} >
-                        <Form.Label>Username</Form.Label>
-                        <Form.Control type="text"
-                                      name="username"
-                                      isValid={!errors.username && values.username !== ''}
-                                      isInvalid={ !!errors.username }
-                                      value={values.username}
-                                      onChange={event => handleChange(event)}
-                                      placeholder="Enter username" />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.username}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                </div>
-                <div className="d-flex justify-content-center">
-                    <Form.Group as={Col} md={5} >
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type="password"
-                                      name="password"
-                                      isValid={!errors.password && values.password !== ''}
-                                      isInvalid={!!errors.password}
-                                      value={values.password}
-                                      onChange={event => handleChange(event)}
-                                      placeholder="Enter password" />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.password}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                </div>
-                <div className="d-flex justify-content-center mt-4">
-                    <Button type="submit"  >Login</Button>
+                <div className="content">
+                    <div className="d-flex justify-content-center mt-2">
+                        <Form.Group as={Col} md={5} >
+                            <Form.Label>Username</Form.Label>
+                            <Form.Control type="text"
+                                          name="username"
+                                          isValid={!errors.username && values.username !== ''}
+                                          isInvalid={ !!errors.username }
+                                          value={values.username}
+                                          onChange={event => handleChange(event)}
+                                          placeholder="Enter username" />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.username}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </div>
+                    <div className="d-flex justify-content-center">
+                        <Form.Group as={Col} md={5} >
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control type="password"
+                                          name="password"
+                                          isValid={!errors.password && values.password !== ''}
+                                          isInvalid={!!errors.password}
+                                          value={values.password}
+                                          onChange={event => handleChange(event)}
+                                          placeholder="Enter password" />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.password}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </div>
+                    <div className="d-flex justify-content-center mt-4">
+                        <Button type="submit"  >Login</Button>
+                    </div>
                 </div>
             </Form>
         </>

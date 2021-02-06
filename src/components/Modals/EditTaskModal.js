@@ -76,11 +76,6 @@ function EditTaskModal(props) {
                 html: 'You want to edit your task',
                 confirmButtonText: `Confirm`,
                 showCancelButton: true,
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'You need to write something!'
-                    }
-                }
             }).then((result) => {
                 isConfirm = result.isConfirmed
             })
@@ -95,7 +90,7 @@ function EditTaskModal(props) {
                     description: data.description
                 }))
 
-                if(response.status === 200){
+                if(response.data.success){
                     notify(response.data.message, 'success');
                     return window.location.href = '/';
                 }

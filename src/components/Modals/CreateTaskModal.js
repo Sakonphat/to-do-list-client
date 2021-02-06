@@ -8,7 +8,8 @@ import {
 import TasksAction from "../../stores/tasks/TasksAction";
 import notify from "../../utils/Notify";
 import {useDispatch} from "react-redux";
-// import {useHistory} from 'react-router-dom';
+import LoadingAction from "../../stores/global/loading/LoadingAction";
+import Swal from "sweetalert2";
 
 function CreateTaskModal(props) {
 
@@ -72,14 +73,29 @@ function CreateTaskModal(props) {
         event.preventDefault()
 
         if(validateForm()){
-            let data = { ...values }
-            // console.log(data);
-            const response = await dispatch(TasksAction.createTask(data))
 
-            if(response.status === 200){
-                notify(response.data.message, 'success');
-                return window.location.href = '/';
-            }
+            await Swal.fire({
+                icon: 'question',
+                title: 'Are you sure ?',
+                html: 'You want to create this task',
+                confirmButtonText: `Confirm`,
+                showCancelButton: true,
+            }).then( async (result) => {
+                if(result.isConfirmed){
+                    let data = { ...values }
+                    // console.log(data);
+                    await dispatch(LoadingAction.setLoading())
+                    const response = await dispatch(TasksAction.createTask(data))
+
+                    if(response.data.success){
+                        notify(response.data.message, 'success');
+                        return window.location.href = '/';
+                    }
+                }
+                else{
+                    console.log("Cancel")
+                }
+            })
         }
         else{
             console.error('Invalid Form');

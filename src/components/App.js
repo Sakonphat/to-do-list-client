@@ -21,7 +21,8 @@ function App() {
     const loadingStyle = { position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",zIndex: 2147483647 };
 
     const toastStyle = {
-        marginTop: "3rem"
+        marginTop: "3rem",
+        zIndex: 2147483648
     }
 
     const { isOpen, title, description } = useSelector(state => state.modal);

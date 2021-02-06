@@ -49,7 +49,7 @@ function TaskDetailModal(props) {
                     <div className="mt-2">
                         <span className="d-flex font-weight-bold font-size-larger col-12">Description :</span>
                         <div className="font-weight-normal font-size-larger description">
-                            {props.task.description}
+                            {props.task.description ? props.task.description : "No description" }
                         </div>
                     </div>
                 </div>

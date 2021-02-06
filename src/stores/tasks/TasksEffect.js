@@ -22,4 +22,28 @@ export default class TasksEffect{
         HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
         return await HttpUtility.put('/api/v1/edit', data);
     }
+
+    static async completeTask(uuid) {
+        let token = Cookies.get("token")
+        HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
+        return await HttpUtility.put('/api/v1/complete/' + uuid);
+    }
+
+    static async undoTask(uuid) {
+        let token = Cookies.get("token")
+        HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
+        return await HttpUtility.put('/api/v1/undo/' + uuid);
+    }
+
+    static async deleteTask(uuid) {
+        let token = Cookies.get("token")
+        HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
+        return await HttpUtility.delete('/api/v1/delete/' + uuid);
+    }
+
+    static async deleteAllTask() {
+        let token = Cookies.get("token")
+        HttpUtility.defaults.headers['Authorization'] = "Bearer " + token
+        return await HttpUtility.delete('/api/v1/delete-all');
+    }
 }

@@ -23,11 +23,11 @@ httpUtility.interceptors.response.use(function (response) {
     // Do something with response data
     return response;
 }, function (error) {
-    console.log(error);
+    // console.log(error);
 
     if (error.response.status === 422) {
         const { message } = error.response.data;
-        console.log(message)
+        // console.log(message)
         notify(message[Object.keys(message)[0]], 'error');
     }
 

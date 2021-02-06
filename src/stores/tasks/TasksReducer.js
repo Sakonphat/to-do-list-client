@@ -19,6 +19,22 @@ export default function TasksReducer(state = initialState, action){
             return {
                 ...state
             };
+        case "TasksAction.SET_COMPLETED" :
+            return {
+                ...state
+            };
+        case "TasksAction.SET_UNDO" :
+            return {
+                ...state
+            };
+        case "TasksAction.DELETE_TASK" :
+            return {
+                ...state
+            };
+        case "TasksAction.DELETE_ALL_TASK" :
+            return {
+                ...state
+            };
         case "TasksAction.SET_LOADING" :
             return {
                 ...state,

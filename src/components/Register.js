@@ -1,13 +1,22 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
     Form,
     Row,
     Col,
-    Button
+    Button,
+    // FormControl,
+    InputGroup
 } from "react-bootstrap";
 import {useDispatch} from "react-redux";
 import AuthsAction from "../stores/auths/AuthsAction"
 import notify from '../utils/Notify';
+import {
+    FaEyeSlash,
+    FaEye
+}
+from "react-icons/fa";
+import Swal from "sweetalert2";
+import LoadingAction from "../stores/global/loading/LoadingAction";
 
 const initialValues = {
     username: '',
@@ -19,6 +28,10 @@ function Register(props) {
     const [values, setValues] = useState(initialValues);
     const [errors, setErrors] = useState(initialValues);
     const [isShowPassword, setIsShowPassword] = useState(false);
+
+    useEffect( () => {
+        dispatch(LoadingAction.unsetLoading())
+    }, [dispatch])
 
     const validateUsername = (value) => {
         let error = '';
@@ -90,14 +103,36 @@ function Register(props) {
         event.preventDefault();
 
         if(validateForm()){
-            let data = { ...values }
-            // console.log(data);
-            const response = await dispatch(AuthsAction.register(data));
-            // console.log(response);
-            if(response.status === 200){
-                notify(response.data.message, 'success');
-                props.history.push('/login')
-            }
+            await Swal.fire({
+                icon: 'question',
+                title: 'Are you sure ?',
+                html: 'You want to register this username',
+                confirmButtonText: `Confirm`,
+                showCancelButton: true,
+            }).then( async (result) => {
+                if(result.isConfirmed){
+                    let data = { ...values }
+                    // console.log(data);
+                    const response = await dispatch(AuthsAction.register(data));
+                    // console.log(response);
+                    if(response.data.success){
+                        notify(response.data.message, 'success');
+                        props.history.push('/login')
+                    }
+                    else{
+                        data.password = ""
+                        data.username = ""
+                        setValues(data)
+                        let tempErr = { ...errors }
+                        tempErr.username = ""
+                        tempErr.password = ""
+                        setErrors(tempErr)
+                    }
+                }
+                else{
+                    console.log("Cancel")
+                }
+            })
         }
         else{
             console.error('Invalid Form');
@@ -128,33 +163,67 @@ function Register(props) {
                         </Form.Control.Feedback>
                     </Form.Group>
                 </div>
-                <div className="d-flex justify-content-center">
-                    <Form.Group as={Col} md={5} >
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type={isShowPassword ? "text" : "password"}
-                                      name="password"
-                                      isValid={!errors.password && values.password !== ''}
-                                      isInvalid={!!errors.password}
-                                      value={values.password}
-                                      onChange={event => handleChange(event)}
-                                      placeholder="Enter password" />
+                <div className="d-flex justify-content-center mb-4">
+                    {/*<Form.Group as={Col} md={5} >*/}
+                    {/*    <Form.Label>Password</Form.Label>*/}
+                    {/*    <Form.Control type={isShowPassword ? "text" : "password"}*/}
+                    {/*                  name="password"*/}
+                    {/*                  isValid={!errors.password && values.password !== ''}*/}
+                    {/*                  isInvalid={!!errors.password}*/}
+                    {/*                  value={values.password}*/}
+                    {/*                  onChange={event => handleChange(event)}*/}
+                    {/*                  placeholder="Enter password" />*/}
+                    {/*    <Form.Text muted className="ml-2">*/}
+                    {/*        Must be more than 6 characters , contain number and alphabet.*/}
+                    {/*    </Form.Text>*/}
+                    {/*    <Form.Control.Feedback type="invalid">*/}
+                    {/*        {errors.password}*/}
+                    {/*    </Form.Control.Feedback>*/}
+                    {/*    <Button variant="light"*/}
+                    {/*            className="mt-2"*/}
+                    {/*            onClick={*/}
+                    {/*                event => {*/}
+                    {/*                    event.preventDefault();*/}
+                    {/*                    let isShow = !isShowPassword;*/}
+                    {/*                    setIsShowPassword(isShow);*/}
+                    {/*                }*/}
+                    {/*            }>*/}
+                    {/*        {isShowPassword ? "Hide" : "Show"}*/}
+                    {/*    </Button>*/}
+                    {/*</Form.Group>*/}
+                    <Form.Group md={5} className={!!errors.password ? "ml-err" : ""}>
+                        <Form.Label className="mt-3">Password</Form.Label>
+                        <InputGroup as={Col} className="mb-2">
+                            <Form.Control
+                                type={isShowPassword ? "text" : "password"}
+                                name="password"
+                                isValid={!errors.password && values.password !== ''}
+                                isInvalid={!!errors.password}
+                                value={values.password}
+                                onChange={event => handleChange(event)}
+                                placeholder="Enter password" />
+                            <InputGroup.Append>
+                                <Button variant="outline-primary"
+                                        onClick={
+                                            event => {
+                                                event.preventDefault();
+                                                let isShow = !isShowPassword;
+                                                setIsShowPassword(isShow);
+                                            }
+                                        }>
+                                    {
+                                        isShowPassword ? <FaEyeSlash/>
+                                            : <FaEye/>
+                                    }
+                                </Button>
+                            </InputGroup.Append>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.password}
+                            </Form.Control.Feedback>
+                        </InputGroup>
                         <Form.Text muted className="ml-2">
                             Must be more than 6 characters , contain number and alphabet.
                         </Form.Text>
-                        <Form.Control.Feedback type="invalid">
-                            {errors.password}
-                        </Form.Control.Feedback>
-                        <Button variant="light"
-                                className="mt-2"
-                                onClick={
-                                    event => {
-                                        event.preventDefault();
-                                        let isShow = !isShowPassword;
-                                        setIsShowPassword(isShow);
-                                    }
-                                }>
-                            {isShowPassword ? "Hide" : "Show"}
-                        </Button>
                     </Form.Group>
                 </div>
                 <div className="d-flex justify-content-center mt-2">
